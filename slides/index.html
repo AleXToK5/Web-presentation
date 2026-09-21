@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<title>Распределённая система на основе Kubernetes</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="node_modules/@shower/ribbon/styles/index.css">
+
+	<style>
+		.shower {
+			--slide-ratio: calc(16 / 9);
+		}
+
+		/* ---------- базовые правила слайдов ---------- */
+		.slide.k {
+			padding: 0;
+			background: #fff;
+			color: #27303d;
+			font: 15px/1.4 'PT Sans', sans-serif;
+			counter-increment: slide;
+		}
+		.slide.k::after { content: none; }
+		.slide.k.dark { background: #1b3668; color: #fff; }
+
+		.k .in {
+			position: absolute;
+			top: 34px; right: 64px; bottom: 56px; left: 64px;
+			display: flex;
+			flex-direction: column;
+		}
+		.k p { margin: 0; }
+		.k h2 {
+			margin: 0;
+			color: #1b3668;
+			font: bold 30px/1.15 Cambria, Georgia, 'Times New Roman', serif;
+			text-wrap: balance;
+		}
+		.k.dark h2 { color: #fff; }
+		.k .ey {
+			margin-bottom: 10px;
+			color: #c9a227;
+			font: bold 11px/1 'PT Sans', sans-serif;
+			letter-spacing: .16em;
+			text-transform: uppercase;
+		}
+		.k .lead { margin-top: 12px; color: #3b4554; font-size: 16px; line-height: 1.45; }
+		.k.dark .lead { color: #e4e9f3; }
+
+		/* ---------- колонтитул ---------- */
+		.k .pf {
+			position: absolute;
+			right: 64px; bottom: 16px; left: 64px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding-top: 8px;
+			border-top: 1px solid #d9dee6;
+			color: #6b7686;
+			font: 12px/1.2 'PT Sans', sans-serif;
+			letter-spacing: .01em;
+		}
+		.k .pf .pg::before { content: counter(slide); font-weight: bold; }
+		.k.dark .pf { border-top-color: rgba(255, 255, 255, .22); color: #b9c4da; }
+
+		/* ---------- иконки ---------- */
+		.ic { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+		.icg { fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+		.b {
+			flex: none;
+			display: inline-flex; align-items: center; justify-content: center;
+			width: var(--s); height: var(--s);
+			border-radius: 50%;
+			color: #fff;
+		}
+		.b .ic { width: 52%; height: 52%; }
+
+		/* ---------- общие блоки ---------- */
+		.k .card { background: #f2f3f5; border-radius: 10px; }
+		.k .two { display: grid; grid-template-columns: 1fr 1.05fr; gap: 36px; margin-top: 22px; flex: 1; min-height: 0; }
+		.k .hub { display: block; width: 100%; height: 100%; }
+		.k .hub .cap { fill: #6b7686; font: 12px 'PT Sans', sans-serif; }
+		.k .hub.d .cap { fill: #b9c4da; }
+		.k .dgc { display: flex; align-items: center; justify-content: center; padding: 14px; }
+		.k .row { display: flex; align-items: center; gap: 14px; font-size: 16px; line-height: 1.3; }
+		.k .row + .row { margin-top: 16px; }
+		.k .row b { color: #1b3668; }
+		.k .note { color: #6b7686; font-size: 13px; text-align: center; }
+
+		/* ---------- титульный ---------- */
+		.k .cover-t { margin: 0; font: bold 40px/1.12 Cambria, Georgia, serif; color: #1b3668; text-wrap: balance; }
+		.k .cover-t em { font-style: normal; }
+		.k .by { margin-top: 26px; padding-top: 14px; border-top: 1px solid #d9dee6; max-width: 200px; color: #3b4554; font-size: 14px; }
+		.k .by b { color: #1b3668; }
+
+		/* ---------- содержание ---------- */
+		.k .toc {
+			display: grid;
+			grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 84px); grid-auto-flow: column;
+			gap: 14px; margin-top: 30px;
+		}
+		.k .toc div {
+			display: flex; align-items: center; gap: 18px;
+			padding: 0 22px;
+			background: #f2f3f5; border-radius: 8px;
+			color: #1b3668; font-weight: bold; font-size: 17px; line-height: 1.25;
+		}
+		.k .toc span { color: #c7ceda; font: bold 24px Cambria, Georgia, serif; }
+
+		/* ---------- карточки-колонки (4 шт.) ---------- */
+		.k .cols4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 30px; }
+		.k .tile { display: flex; flex-direction: column; align-items: center; padding: 26px 16px 22px; border-radius: 8px; text-align: center; }
+		.k .tile h3 { margin: 16px 0 8px; color: #1b3668; font: bold 18px/1.2 Cambria, Georgia, serif; }
+		.k .tile p { color: #4a5565; font-size: 14px; line-height: 1.4; }
+		.k .tile.red { background: #fbeff1; }
+		.k .tile.gray { background: #f2f3f5; }
+
+		/* ---------- архитектура ---------- */
+		.k .two-eq { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 22px; flex: 1; min-height: 0; }
+		.k .panel { display: flex; flex-direction: column; padding: 20px 22px; background: #f2f3f5; border-radius: 10px; }
+		.k .rows { flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; }
+		.k .rows .row + .row { margin-top: 0; }
+		.k .panel h3 { margin: 0 0 6px; color: #1b3668; font: bold 16px/1.2 'PT Sans', sans-serif; }
+		.k .panel .row { font-size: 15.5px; }
+		.k .nodes { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+		.k .nd { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px 10px 14px; background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(27, 54, 104, .12); }
+		.k .nd b { margin-top: 8px; color: #1b3668; font-size: 15px; }
+		.k .nd small { margin: 2px 0 10px; color: #6b7686; font-size: 12px; }
+		.k .chips { display: flex; gap: 6px; }
+		.k .chip { padding: 6px 12px; background: #3f7cac; border-radius: 4px; color: #fff; font-size: 12px; font-weight: bold; }
+
+		/* ---------- объекты ---------- */
+		.k .obj { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; height: 320px; margin-top: 32px; }
+		.k .obj > div { display: flex; flex-direction: column; overflow: hidden; border-radius: 8px; background: #f2f3f5; }
+		.k .obj .top { display: flex; align-items: center; justify-content: center; flex: none; height: 140px; color: #fff; font-size: 52px; }
+		.k .obj .bd { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 16px; text-align: center; }
+		.k .obj h3 { margin: 0 0 8px; color: #1b3668; font: bold 19px/1.2 Cambria, Georgia, serif; }
+		.k .obj p { color: #4a5565; font-size: 14px; line-height: 1.4; }
+
+		/* ---------- масштабирование ---------- */
+		.k .scale { display: grid; grid-template-columns: 1fr 22px 1fr 22px 1fr; align-items: center; height: 100%; }
+		.k .col { display: flex; flex-direction: column; height: 100%; max-height: 300px; padding: 14px 12px; background: #f2f3f5; border-radius: 8px; }
+		.k .col .pods { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 8px; flex: 1; }
+		.k .col .pods i { width: 26px; height: 26px; border-radius: 5px; }
+		.k .col span { margin-top: 10px; color: #1b3668; font-size: 12.5px; font-weight: bold; text-align: center; }
+		.k .arr { color: #c9a227; font-size: 22px; display: flex; justify-content: center; }
+
+		/* ---------- самовосстановление ---------- */
+		.k .heal { display: grid; grid-template-columns: 1fr 46px 1fr; align-items: center; gap: 0; margin-top: 22px; flex: 1; min-height: 0; }
+		.k .hp { display: flex; flex-direction: column; justify-content: center; height: 100%; max-height: 300px; padding: 16px 18px; border-radius: 10px; }
+		.k .hp.bad { background: #fbeff1; }
+		.k .hp.good { background: #eaf5ee; }
+		.k .hp h3 { margin: 0 0 14px; color: #1b3668; font: bold 15px/1.2 'PT Sans', sans-serif; }
+		.k .hp .nds { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+		.k .hp .nd { padding: 12px 8px 12px; }
+		.k .hp .nd small { margin: 0 0 8px; }
+		.k .hp .pcs { display: flex; gap: 8px; min-height: 42px; }
+		.k .hp .cap2 { margin-top: 14px; color: #4a5565; font-size: 13px; text-align: center; }
+		.k .pc { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; color: #fff; font-size: 20px; }
+		.k .pc.ghost { background: transparent !important; border: 2px dashed #c7ceda; }
+		.k .pc .mk { position: absolute; right: -5px; bottom: -5px; display: flex; align-items: center; justify-content: center; width: 18px; height: 18px; border: 2px solid #fff; border-radius: 50%; font-size: 10px; }
+		.k .nd.dead { opacity: .55; }
+
+		/* ---------- поиск сервисов ---------- */
+		.k .disc { display: grid; grid-template-columns: 1fr 150px 1fr; align-items: center; margin-top: 22px; flex: 1; min-height: 0; }
+		.k .dpan { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; max-height: 210px; background: #f2f3f5; border-radius: 10px; }
+		.k .dpan h3 { margin: 0 0 16px; color: #6b7686; font: bold 14px/1 'PT Sans', sans-serif; }
+		.k .dpan .pcs { display: flex; gap: 14px; }
+		.k .dmid { position: relative; display: flex; flex-direction: column; align-items: center; }
+		.k .dmid::before { content: ''; position: absolute; top: 34px; right: 0; left: 0; height: 3px; background: #c7ceda; }
+		.k .dmid .b { position: relative; box-shadow: 0 0 0 8px #fff; }
+		.k .dmid b { margin-top: 14px; color: #1b3668; font-size: 15px; }
+
+		/* ---------- интернет-магазин ---------- */
+		.k .cluster { position: relative; display: grid; grid-template-columns: 1fr 30px 1fr 30px 1fr; align-items: center; margin-top: 22px; padding: 42px 22px 22px; flex: 1; max-height: 300px; border: 2px dashed #c7ceda; border-radius: 12px; background: #f7f8fa; }
+		.k .cluster > i { position: absolute; top: 14px; left: 20px; color: #6b7686; font-size: 12px; font-style: normal; font-weight: bold; letter-spacing: .04em; }
+		.k .part { display: flex; flex-direction: column; align-items: center; padding: 24px 14px 22px; background: #fff; border-radius: 8px; box-shadow: 0 1px 5px rgba(27, 54, 104, .12); text-align: center; }
+		.k .part h3 { margin: 14px 0 6px; color: #1b3668; font: bold 18px/1.2 Cambria, Georgia, serif; }
+		.k .part p { color: #6b7686; font-size: 13.5px; }
+
+		/* ---------- выводы ---------- */
+		.k .cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 22px; flex: 1; min-height: 0; }
+		.k .cmp .panel { padding: 20px 22px; }
+		.k .cmp .row { align-items: center; font-size: 15px; }
+		.k .cmp .row b { display: block; margin-bottom: 2px; font-size: 17.5px; }
+		.k .cmp .row span.t { display: block; color: #4a5565; }
+
+
+		/* ---------- таблица объектов ---------- */
+		.k .ktbl {
+			width: calc(100% - 4px);
+			margin-top: 24px;
+			margin-left: 4px;
+			border-collapse: collapse;
+			font-size: 15px;
+			table-layout: fixed;
+		}
+		.k .ktbl col:nth-child(1) { width: 23%; }
+		.k .ktbl col:nth-child(2) { width: 27%; }
+		.k .ktbl col:nth-child(3) { width: 22%; }
+		.k .ktbl col:nth-child(4) { width: 28%; }
+		.k .ktbl thead tr {
+			background: #1B3668;
+			color: #fff;
+		}
+		.k .ktbl th {
+			padding: 12px 16px;
+			font: bold 13px/1.2 'PT Sans', sans-serif;
+			letter-spacing: .05em;
+			text-transform: uppercase;
+			text-align: left;
+		}
+		.k .ktbl tbody tr {
+			border-bottom: 1px solid #e2e6ed;
+		}
+		.k .ktbl tbody tr:nth-child(even) {
+			background: #f7f8fa;
+		}
+		.k .ktbl tbody tr:hover {
+			background: #eef2f8;
+		}
+		.k .ktbl td {
+			padding: 13px 16px;
+			vertical-align: middle;
+			line-height: 1.35;
+			color: #27303d;
+		}
+		.k .ktbl td:first-child,
+		.k .ktbl th:first-child {
+			padding-left: 10px;
+		}
+		.k .ktbl td b {
+			color: #1B3668;
+			font-size: 16px;
+		}
+		.k .kbadge {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 26px; height: 26px;
+			border-radius: 5px;
+			vertical-align: middle;
+			margin-right: 8px;
+			margin-left: 4px;
+			color: #fff;
+			font-size: 16px;
+		}
+		.k .kbadge .ic { width: 60%; height: 60%; }
+		.k .kdot {
+			display: inline-block;
+			width: 10px; height: 10px;
+			border-radius: 50%;
+			vertical-align: middle;
+			margin-right: 10px;
+		}
+
+		/* ---------- финал ---------- */
+		.k .end { align-items: center; justify-content: center; text-align: center; }
+		.k .end h2 { margin-top: 26px; font-size: 44px; }
+		.k .end .sub { margin-top: 12px; color: #e4e9f3; font-size: 20px; }
+		.k .end .who { margin-top: 30px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, .25); color: #c9d3e6; font-size: 15px; }
+	</style>
+</head>
+<body class="shower list">
+
+	<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+		<defs>
+			<symbol id="i-cube" viewBox="0 0 24 24"><path d="M12 2.5 20 7v10l-8 4.5L4 17V7z"/><path d="M4 7l8 4.5L20 7M12 11.5v10"/></symbol>
+			<symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5.6"/><circle cx="12" cy="12" r="1.8"/><path d="M12 2.6v3.2M12 18.2v3.2M2.6 12h3.2M18.2 12h3.2M5.4 5.4l2.3 2.3M16.3 16.3l2.3 2.3M18.6 5.4l-2.3 2.3M7.7 16.3l-2.3 2.3"/></symbol>
+			<symbol id="i-server" viewBox="0 0 24 24"><rect x="3" y="3.5" width="18" height="7" rx="1.8"/><rect x="3" y="13.5" width="18" height="7" rx="1.8"/><path d="M7 7h.01M7 17h.01"/></symbol>
+			<symbol id="i-network" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.4"/><circle cx="5" cy="18" r="2.4"/><circle cx="19" cy="18" r="2.4"/><path d="M11 7.2 6 15.8M13 7.2l5 8.6M7.6 18h8.8"/></symbol>
+			<symbol id="i-exchange" viewBox="0 0 24 24"><path d="M4 8h15l-3.5-3.5M20 16H5l3.5 3.5"/></symbol>
+			<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+			<symbol id="i-cross" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+			<symbol id="i-warning" viewBox="0 0 24 24"><path d="M12 3.5 21.5 20h-19z"/><path d="M12 10v4.5M12 17.4h.01"/></symbol>
+			<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.2l3.5 2"/></symbol>
+			<symbol id="i-balance" viewBox="0 0 24 24"><path d="M12 4v16M7 20h10M5 7h14"/><path d="M5 7l-2.6 6a3 3 0 0 0 5.2 0zM19 7l-2.6 6a3 3 0 0 0 5.2 0z"/></symbol>
+			<symbol id="i-bug" viewBox="0 0 24 24"><ellipse cx="12" cy="13.5" rx="5" ry="6.5"/><path d="M9 7.6a3 3 0 0 1 6 0M12 8v12M4 10l3.2 1.6M20 10l-3.2 1.6M3.5 15H7M20.5 15H17M5 20l3.2-2.2M19 20l-3.2-2.2"/></symbol>
+			<symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3 2.5 8 12 13l9.5-5z"/><path d="M2.5 12.2 12 17.2l9.5-5M2.5 16.4 12 21.4l9.5-5"/></symbol>
+			<symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5H9l2 2.5h8.5A1.5 1.5 0 0 1 21 9v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18z"/></symbol>
+			<symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7.5" ry="3"/><path d="M4.5 6v12c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3V6M4.5 12c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3"/></symbol>
+			<symbol id="i-mobile" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.2"/><path d="M11 18.5h2"/></symbol>
+			<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2.8 20 6v6c0 4.7-3.3 8.2-8 9.7C7.3 20.2 4 16.7 4 12V6z"/><path d="M8.6 12l2.4 2.4 4.4-4.8"/></symbol>
+			<symbol id="i-expand" viewBox="0 0 24 24"><path d="M14 4h6v6M10 20H4v-6M20 4l-6.5 6.5M4 20l6.5-6.5"/></symbol>
+			<symbol id="i-robot" viewBox="0 0 24 24"><rect x="4.5" y="8" width="15" height="11.5" rx="3"/><path d="M12 8V4.6M9.5 13h.01M14.5 13h.01M9.5 16.3h5"/><circle cx="12" cy="3.6" r="1"/></symbol>
+			<symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></symbol>
+			<symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18.5a4.5 4.5 0 0 1-.7-8.95A6 6 0 0 1 17.8 9.6 4.5 4.5 0 0 1 17.5 18.5z"/></symbol>
+			<symbol id="i-chip" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="1.6"/><path d="M10 3.5V7M14 3.5V7M10 17v3.5M14 17v3.5M3.5 10H7M3.5 14H7M17 10h3.5M17 14h3.5"/></symbol>
+			<symbol id="i-spark" viewBox="0 0 24 24"><path d="M11 3l1.9 5.6L18.5 10.5l-5.6 1.9L11 18l-1.9-5.6L3.5 10.5l5.6-1.9zM19 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/></symbol>
+			<symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 4v16h16M8 15l3.2-4.2 3 2.4L19 7"/></symbol>
+			<symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></symbol>
+			<symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></symbol>
+		</defs>
+	</svg>
+
+	<header class="caption">
+		<h1>Распределённая система на основе Kubernetes</h1>
+		<p>Токарев А.А. · ИУ3-32М · Вариант 3</p>
+	</header>
+
+	<section class="slide k" id="Cover">
+		<div class="in">
+			<div class="two" style="grid-template-columns:1fr 1.05fr;margin-top:0;align-items:center;gap:40px">
+				<div>
+					<div class="ey">КУРС: МУЛЬТИМЕДИЙНЫЕ ТЕХНОЛОГИИ</div>
+					<h1 class="cover-t">Распределённая система на основе Kubernetes</h1>
+					<p class="lead" style="margin-top:18px">Как множество контейнеров работает вместе как единая надёжная система.</p>
+					<p class="by"><b>Автор:</b> Токарев А.А.</p>
+				</div>
+				<div class="card dgc" style="height:100%;max-height:390px">
+					<img src="pictures/whale-docker.gif"
+						 alt="Docker whale"
+						 style="max-height:340px;max-width:100%;border-radius:8px;object-fit:contain">
+				</div>
+			</div>
+		</div>
+		<div class="pf"><span>Токарев Александр Алексеевич, ИУ3-32М, taa21u591@bmstu.ru, Вариант 3</span><span class="pg"></span></div>
+	</section>
+
+	<section class="slide k" id="Plan">
+		<div class="in"><div class="ey">ПЛАН ПРЕЗЕНТАЦИИ</div><h2>Содержание</h2><div class="toc"><div><span>01</span>Что такое распределённые системы</div><div><span>02</span>Kubernetes: что это и зачем</div><div><span>03</span>Архитектура и основные объекты</div><div><span>04</span>Масштабирование и отказоустойчивость</div><div><span>05</span>Пример из реальной жизни</div><div><span>06</span>Будущее технологии и выводы</div></div>
+		</div>
+		<div class="pf"><span>Токарев Александр Алексеевич, ИУ3-32М, taa21u591@bmstu.ru, Вариант 3</span><span class="pg"></span></div>
+	</section>
+
+	<section class="slide k" id="Intro">
+		<div class="in"><div class="ey">ВВЕДЕНИЕ</div><h2>Что такое распределённая система?</h2>
+			<div class="two" style="grid-template-columns:1fr 1.1fr">
+				<div>
+					<p class="lead" style="margin-top:0;font-size:17px">Несколько компьютеров работают вместе и выглядят для пользователя как одно целое.</p>
+					<div style="margin-top:26px">
+						<div class="row"><span class="b" style="--s:40px;background:#1B3668"><svg class="ic " aria-hidden="true"><use href="#i-server"/></svg></span><span>Данные и работа делятся между узлами</span></div>
+						<div class="row"><span class="b" style="--s:40px;background:#3F7CAC"><svg class="ic " aria-hidden="true"><use href="#i-exchange"/></svg></span><span>Узлы обмениваются информацией по сети</span></div>
+						<div class="row"><span class="b" style="--s:40px;background:#2F8F5B"><svg class="ic " aria-hidden="true"><use href="#i-check"/></svg></span><span>Если один узел упал — работают остальные</span></div>
+					</div>
+				</div>
+				<div class="card dgc"><svg class="hub" viewBox="0 0 420 316" role="img" aria-label="Узлы формируют единую систему"><line x1="210" y1="78" x2="70" y2="210" stroke="#C7CEDA" stroke-width="2.5"/><line x1="210" y1="78" x2="210" y2="210" stroke="#C7CEDA" stroke-width="2.5"/><line x1="210" y1="78" x2="350" y2="210" stroke="#C7CEDA" stroke-width="2.5"/><circle cx="70" cy="210" r="30" fill="#3F7CAC"/><use class="icg" href="#i-server" x="55" y="195" width="30" height="30"/><circle cx="210" cy="210" r="30" fill="#3F7CAC"/><use class="icg" href="#i-server" x="195" y="195" width="30" height="30"/><circle cx="350" cy="210" r="30" fill="#3F7CAC"/><use class="icg" href="#i-server" x="335" y="195" width="30" height="30"/><circle cx="210" cy="78" r="36" fill="#C9A227"/><use class="icg" href="#i-server" x="192" y="60" width="36" height="36"/><text x="210" y="308" text-anchor="middle" class="cap">Узлы формируют единую систему</text></svg></div>
+			</div>
+		</div>
+		<div class="pf"><span>Токарев Александр Алексеевич, ИУ3-32М, taa21u591@bmstu.ru, Вариант 3</span><span class="pg"></span></div>
+	</section>
+
+	<section class="slide k" id="Problem">
+		<div class="in"><div class="ey">ПРОБЛЕМА</div><h2>Почему нельзя управлять этим вручную?</h2><div class="cols4" style="margin-top:36px"><div class="tile red" style="min-height:290px;justify-content:center"><span class="b" style="--s:56px;background:#A6192E"><svg class="ic " aria-hidden="true"><use href="#i-warning"/></svg></span><h3>Сбои серверов</h3><p>Приложение падает — кто-то должен вручную его перезапустить</p></div><div class="tile red" style="min-height:290px;justify-content:center"><span class="b" style="--s:56px;background:#A6192E"><svg class="ic " aria-hidden="true"><use href="#i-clock"/></svg></span><h3>Простои</h3><p>Ручное обновление занимает время, пользователи ждут</p></div><div class="tile red" style="min-height:290px;justify-content:center"><span class="b" style="--s:56px;background:#A6192E"><svg class="ic " aria-hidden="true"><use href="#i-balance"/></svg></span><h3>Сложно масштабировать</h3><p>При росте нагрузки нужно вручную добавлять серверы</p></div><div class="tile red" style="min-height:290px;justify-content:center"><span class="b" style="--s:56px;background:#A6192E"><svg class="ic " aria-hidden="true"><use href="#i-bug"/></svg></span><h3>Человеческий фактор</h3><p>Ошибка в ручной настройке — и всё останавливается</p></div></div>
+		</div>
+		<div class="pf"><span>Токарев Александр Алексеевич, ИУ3-32М, taa21u591@bmstu.ru, Вариант 3</span><span class="pg"></span></div>
+	</section>
+
+	<section class="slide k dark" id="WhatIsK8s">
+		<div class="in">
+			<div class="two" style="margin-top:0;align-items:center;grid-template-columns:1fr 1.05fr;gap:40px">
+				<div>
+					<div class="ey">ЗНАКОМСТВО С ТЕХНОЛОГИЕЙ</div>
+					<h2>Что такое Kubernetes?</h2>
+					<p class="lead" style="margin-top:16px">Простыми словами — это «диспетчер», который сам управляет множеством контейнеров с приложением: запускает, следит за состоянием и перезапускает при сбое.</p>
+					<p class="lead" style="margin-top:18px"><b style="color:#c9a227">Kubernetes</b> («k8s») — открытая платформа для оркестрации контейнеров, созданная в Google.</p>
+				</div>
+				<div style="height:100%;max-height:390px"><svg class="hub d" viewBox="0 0 420 316" role="img" aria-label="Оркестратор управляет контейнерами"><line x1="210" y1="148" x2="210.0" y2="44.0" stroke="rgba(255,255,255,.3)" stroke-width="2.5"/><line x1="210" y1="148" x2="300.1" y2="96.0" stroke="rgba(255,255,255,.3)" stroke-width="2.5"/><line x1="210" y1="148" x2="300.1" y2="200.0" stroke="rgba(255,255,255,.3)" stroke-width="2.5"/><line x1="210" y1="148" x2="210.0" y2="252.0" stroke="rgba(255,255,255,.3)" stroke-width="2.5"/><line x1="210" y1="148" x2="119.9" y2="200.0" stroke="rgba(255,255,255,.3)" stroke-width="2.5"/><line x1="210" y1="148" x2="119.9" y2="96.0" stroke="rgba(255,255,255,.3)" stroke-width="2.5"/><circle cx="210.0" cy="44.0" r="25" fill="#3F7CAC" stroke="#fff" stroke-width="2"/><use class="icg" href="#i-cube" x="199.0" y="33.0" width="22" height="22"/><circle cx="300.1" cy="96.0" r="25" fill="#3F7CAC" stroke="#fff" stroke-width="2"/><use class="icg" href="#i-cube" x="289.1" y="85.0" width="22" height="22"/><circle cx="300.1" cy="200.0" r="25" fill="#3F7CAC" stroke="#fff" stroke-width="2"/><use class="icg" href="#i-cube" x="289.1" y="189.0" width="22" height="22"/><circle cx="210.0" cy="252.0" r="25" fill="#3F7CAC" stroke="#fff" stroke-width="2"/><use class="icg" href="#i-cube" x="199.0" y="241.0" width="22" height="22"/><circle cx="119.9" cy="200.0" r="25" fill="#3F7CAC" stroke="#fff" stroke-width="2"/><use class="icg" href="#i-cube" x="108.9" y="189.0" width="22" height="22"/><circle cx="119.9" cy="96.0" r="25" fill="#3F7CAC" stroke="#fff" stroke-width="2"/><use class="icg" href="#i-cube" x="108.9" y="85.0" width="22" height="22"/><circle cx="210" cy="148" r="42" fill="#C9A227"/><use class="icg" href="#i-gear" x="190" y="128" width="40" height="40"/><text x="210" y="308" text-anchor="middle" class="cap">Оркестратор управляет контейнерами вокруг него</text></svg></div>
+			</div>
+		</div>
+		<div class="pf"><span>Токарев Александр Алексеевич, ИУ3-32М, taa21u591@bmstu.ru, Вариант 3</span><span class="pg"></span></div>
+	</section>
+
+	<section class="slide k" id="Architecture">
+		<div class="in"><div class="ey">КАК ЭТО УСТРОЕНО</div><h2>Архитектура кластера Kubernetes</h2>
+			<div class="two-eq">
+				<div class="panel">
+					<h3>Control Plane — «мозг» кластера</h3>
+					<div class="rows"><div class="row"><span class="b" style="--s:44px;background:#1B3668"><svg class="ic " aria-hidden="true"><use href="#i-exchange"/></svg></span><span><b>API Server</b> — принимает команды</span></div><div class="row"><span class="b" style="--s:44px;background:#1B3668"><svg class="ic " aria-hidden="true"><use href="#i-database"/></svg></span><span><b>etcd</b> — хранит состояние кластера</span></div><div class="row"><span class="b" style="--s:44px;background:#1B3668"><svg class="ic " aria-hidden="true"><use href="#i-list"/></svg></span><span><b>Scheduler</b> — решает, где запустить контейнер</span></div><div class="row"><span class="b" style="--s:44px;background:#1B3668"><svg class="ic " aria-hidden="true"><use href="#i-chart"/></svg></span><span><b>Controller Manager</b> — следит, что всё работает как надо</span></div></div>
+				</div>
+				<div class="panel">
+					<h3>Worker Nodes — «руки» кластера</h3>
+					<div class="nodes"><div class="nd"><span class="b" style="--s:40px;background:#1B3668"><svg class="ic " aria-hidden="true"><use href="#i-server"/></svg></span><b>Node 1</b><small>kubelet · kube-proxy</small><div class="chips"><span class="chip">Pod</span><span class="chip">Pod</span></div></div><div class="nd"><span class="b" style="--s:40px;background:#1B3668"><svg class="ic " aria-hidden="true"><use href="#i-server"/></svg></span><b>Node 2</b><small>kubelet · kube-proxy</small><div class="chips"><span class="chip">Pod</span><span class="chip">Pod</span></div></div></div>
+				</div>
+			</div>
+		</div>
+		<div class="pf"><span>Токарев Александр Алексеевич, ИУ3-32М, taa21u591@bmstu.ru, Вариант 3</span><span class="pg"></span></div>
+	</section>
+
+	<section class="slide k" id="Objects">
+		<div class="in">
+			<div class="ey">КЛЮЧЕВЫЕ ПОНЯТИЯ</div>
+			<h2>Основные объекты Kubernetes</h2>
+			<table class="ktbl">
+				<colgroup><col><col><col><col></colgroup>
+				<thead>
+					<tr>
+						<th>Объект</th>
+						<th>Роль</th>
+						<th>Аналогия</th>
+						<th>Пример использования</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><span class="kdot" style="background:#3F7CAC"></span><b>Pod</b></td>
+						<td>Минимальная единица запуска</td>
+						<td>Квартира в доме</td>
+						<td>Контейнер с веб-сервером Nginx</td>
+					</tr>
+					<tr>
+						<td><span class="kdot" style="background:#1B3668"></span><b>Deployment</b></td>
+						<td>Следит за нужным числом копий Pod</td>
+						<td>Управляющая компания</td>
+						<td>Поддержать 3 копии API всегда запущенными</td>
+					</tr>
+					<tr>
+						<td><span class="kdot" style="background:#C9A227"></span><b>Service</b></td>
+						<td>Постоянная точка доступа к Pod'ам</td>
+						<td>Стойка ресепшн</td>
+						<td>Балансировка трафика между Pod'ами backend</td>
+					</tr>
+					<tr>
+						<td><span class="kdot" style="background:#A6192E"></span><b>Namespace</b></td>
+						<td>Изолированная зона внутри кластера</td>
+						<td>Отдельный этаж здания</td>
+						<td>Разделить окружения dev и production</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="pf"><span>Токарев Александр Алексеевич, ИУ3-32М, taa21u591@bmstu.ru, Вариант 3</span><span class="pg"></span></div>
+	</section>
+
+	<section class="slide k" id="Autoscaling">
+		<div class="in"><div class="ey">КАК ЭТО РАБОТАЕТ</div><h2>Автоматическое масштабирование</h2>
+			<div class="two" style="grid-template-columns:1fr 1.1fr">
+				<div>
+					<p class="lead" style="margin-top:0">Kubernetes сам добавляет копии приложения при росте нагрузки — и убирает лишние, когда нагрузка спадает.</p>
+					<div style="margin-top:24px">
+						<div class="row" style="font-size:15px"><span class="b" style="--s:38px;background:#1B3668"><svg class="ic " aria-hidden="true"><use href="#i-chart"/></svg></span><span>Больше пользователей → больше копий Pod</span></div>
+						<div class="row" style="font-size:15px"><span class="b" style="--s:38px;background:#3F7CAC"><svg class="ic " aria-hidden="true"><use href="#i-expand"/></svg></span><span>Меньше нагрузка → лишние копии удаляются</span></div>
+					</div>
+				</div>
+				<div class="scale">
+					<div class="col"><div class="pods"><i style=background:#3F7CAC></i></div><span>Низкая нагрузка</span></div><div class="arr"><svg class="ic " aria-hidden="true"><use href="#i-arrow"/></svg></div><div class="col"><div class="pods"><i style=background:#C9A227></i><i style=background:#C9A227></i><i style=background:#C9A227></i></div><span>Средняя нагрузка</span></div><div class="arr"><svg class="ic " aria-hidden="true"><use href="#i-arrow"/></svg></div><div class="col"><div class="pods"><i style=background:#A6192E></i><i style=background:#A6192E></i><i style=background:#A6192E></i><i style=background:#A6192E></i><i style=background:#A6192E></i></div><span>Высокая нагрузка</span></div>
+				</div>
+			</div>
+		</div>
+		<div class="pf"><span>Токарев Александр Алексеевич, ИУ3-32М, taa21u591@bmstu.ru, Вариант 3</span><span class="pg"></span></div>
+	</section>
+
+	<section class="slide k" id="SelfHealing">
+		<div class="in"><div class="ey">КАК ЭТО РАБОТАЕТ</div><h2>Самовосстановление системы</h2><p class="lead" style="max-width:640px">Если контейнер или узел выходит из строя, Kubernetes не ждёт человека — он сам запускает замену на исправном узле.</p>
+			<div class="heal">
+				<div class="hp bad">
+					<h3>До сбоя</h3>
+					<div class="nds"><div class="nd"><small>Узел 1</small><div class="pcs"><span class="pc" style="background:#3F7CAC"><svg class="ic " aria-hidden="true"><use href="#i-cube"/></svg></span><span class="pc" style="background:#A6192E"><svg class="ic " aria-hidden="true"><use href="#i-cross"/></svg></span></div></div><div class="nd"><small>Узел 2</small><div class="pcs"><span class="pc" style="background:#3F7CAC"><svg class="ic " aria-hidden="true"><use href="#i-cube"/></svg></span></div></div></div>
+					<p class="cap2">Узел с Pod вышел из строя</p>
+				</div>
+				<div class="arr" style="font-size:30px"><svg class="ic " aria-hidden="true"><use href="#i-arrow"/></svg></div>
+				<div class="hp good">
+					<h3>После восстановления</h3>
+					<div class="nds"><div class="nd dead"><small>Узел 1</small><div class="pcs"><span class="pc" style="background:#3F7CAC"><svg class="ic " aria-hidden="true"><use href="#i-cube"/></svg></span></div></div><div class="nd"><small>Узел 2</small><div class="pcs"><span class="pc" style="background:#3F7CAC"><svg class="ic " aria-hidden="true"><use href="#i-cube"/></svg></span><span class="pc" style="background:#3F7CAC"><svg class="ic " aria-hidden="true"><use href="#i-cube"/></svg><span class="mk" style="background:#2F8F5B"><svg class="ic " aria-hidden="true"><use href="#i-check"/></svg></span></span></div></div></div>
+					<p class="cap2">Новый Pod запущен на другом узле</p>
+				</div>
+			</div>
+		</div>
+		<div class="pf"><span>Токарев Александр Алексеевич, ИУ3-32М, taa21u591@bmstu.ru, Вариант 3</span><span class="pg"></span></div>
+	</section>
+
+	<section class="slide k" id="Discovery">
+		<div class="in"><div class="ey">КАК ЭТО РАБОТАЕТ</div><h2>Как сервисы находят друг друга</h2><p class="lead" style="max-width:700px">Pod'ы могут исчезать и появляться на новых местах — поэтому они общаются не напрямую, а через Service, у которого всегда постоянный адрес.</p>
+			<div class="disc">
+				<div class="dpan"><h3>Frontend Pod'ы</h3><div class="pcs"><span class="pc" style="background:#3F7CAC"><svg class="ic " aria-hidden="true"><use href="#i-cube"/></svg></span><span class="pc" style="background:#3F7CAC"><svg class="ic " aria-hidden="true"><use href="#i-cube"/></svg></span></div></div>
+				<div class="dmid"><span class="b" style="--s:68px;background:#C9A227"><svg class="ic " aria-hidden="true"><use href="#i-exchange"/></svg></span><b>Service</b></div>
+				<div class="dpan"><h3>Backend Pod'ы</h3><div class="pcs"><span class="pc" style="background:#1B3668"><svg class="ic " aria-hidden="true"><use href="#i-cube"/></svg></span><span class="pc" style="background:#1B3668"><svg class="ic " aria-hidden="true"><use href="#i-cube"/></svg></span></div></div>
+			</div>
+			<p class="note" style="margin:6px 0 4px">Адрес Service не меняется, даже когда сами Pod'ы обновляются</p>
+		</div>
+		<div class="pf"><span>Токарев Александр Алексеевич, ИУ3-32М, taa21u591@bmstu.ru, Вариант 3</span><span class="pg"></span></div>
+	</section>
+
+	<section class="slide k" id="Example">
+		<div class="in"><div class="ey">НА ПРАКТИКЕ</div><h2>Пример: интернет-магазин на Kubernetes</h2><p class="lead" style="max-width:720px">Каждая часть приложения работает в своих Pod'ах и масштабируется отдельно — весь набор объединяет один кластер.</p>
+			<div class="cluster">
+				<i>КЛАСТЕР KUBERNETES</i>
+				<div class="part"><span class="b" style="--s:56px;background:#3F7CAC"><svg class="ic " aria-hidden="true"><use href="#i-mobile"/></svg></span><h3>Frontend</h3><p>интерфейс магазина</p></div><div class="arr" style="font-size:20px"><svg class="ic " aria-hidden="true"><use href="#i-arrow"/></svg></div>
+				<div class="part"><span class="b" style="--s:56px;background:#1B3668"><svg class="ic " aria-hidden="true"><use href="#i-gear"/></svg></span><h3>API / Backend</h3><p>обработка заказов</p></div><div class="arr" style="font-size:20px"><svg class="ic " aria-hidden="true"><use href="#i-arrow"/></svg></div>
+				<div class="part"><span class="b" style="--s:56px;background:#C9A227"><svg class="ic " aria-hidden="true"><use href="#i-database"/></svg></span><h3>База данных</h3><p>хранит товары и заказы</p></div>
+			</div>
+		</div>
+		<div class="pf"><span>Токарев Александр Алексеевич, ИУ3-32М, taa21u591@bmstu.ru, Вариант 3</span><span class="pg"></span></div>
+	</section>
+
+	<section class="slide k" id="Benefits">
+		<div class="in"><div class="ey">ИТОГИ ПРИМЕНЕНИЯ</div><h2>Преимущества использования Kubernetes</h2><div class="cols4" style="margin-top:36px"><div class="tile gray" style="min-height:290px;justify-content:center"><span class="b" style="--s:60px;background:#1B3668"><svg class="ic " aria-hidden="true"><use href="#i-shield"/></svg></span><h3>Надёжность</h3><p>Система сама восстанавливается после сбоев</p></div><div class="tile gray" style="min-height:290px;justify-content:center"><span class="b" style="--s:60px;background:#3F7CAC"><svg class="ic " aria-hidden="true"><use href="#i-expand"/></svg></span><h3>Масштабируемость</h3><p>Легко выдерживает рост нагрузки</p></div><div class="tile gray" style="min-height:290px;justify-content:center"><span class="b" style="--s:60px;background:#C9A227"><svg class="ic " aria-hidden="true"><use href="#i-robot"/></svg></span><h3>Автоматизация</h3><p>Меньше ручной работы для инженеров</p></div><div class="tile gray" style="min-height:290px;justify-content:center"><span class="b" style="--s:60px;background:#A6192E"><svg class="ic " aria-hidden="true"><use href="#i-globe"/></svg></span><h3>Гибкость</h3><p>Работает одинаково в любом облаке</p></div></div>
+		</div>
+		<div class="pf"><span>Токарев Александр Алексеевич, ИУ3-32М, taa21u591@bmstu.ru, Вариант 3</span><span class="pg"></span></div>
+	</section>
+
+	<section class="slide k" id="Conclusions">
+		<div class="in"><div class="ey">ВЗГЛЯД ВПЕРЁД</div><h2>Будущее технологии и выводы</h2>
+			<div class="cmp">
+				<div class="panel">
+					<h3>Куда движется технология</h3>
+					<div class="rows"><div class="row"><span class="b" style="--s:50px;background:#1B3668"><svg class="ic " aria-hidden="true"><use href="#i-cloud"/></svg></span><div><b>Serverless-подход</b><span class="t">Kubernetes без ручной настройки серверов</span></div></div><div class="row"><span class="b" style="--s:50px;background:#3F7CAC"><svg class="ic " aria-hidden="true"><use href="#i-chip"/></svg></span><div><b>Периферийные вычисления</b><span class="t">Кластеры прямо на устройствах IoT</span></div></div><div class="row"><span class="b" style="--s:50px;background:#C9A227"><svg class="ic " aria-hidden="true"><use href="#i-spark"/></svg></span><div><b>Задачи ИИ и ML</b><span class="t">Оркестрация обучения моделей на GPU</span></div></div></div>
+				</div>
+				<div class="panel">
+					<h3>Главные выводы</h3>
+					<div class="rows"><div class="row"><span class="b" style="--s:40px;background:#2F8F5B"><svg class="ic " aria-hidden="true"><use href="#i-check"/></svg></span><div><span class="t" style="color:#27303d;font-size:16.5px;line-height:1.35">Kubernetes снимает с людей рутину по управлению серверами</span></div></div><div class="row"><span class="b" style="--s:40px;background:#2F8F5B"><svg class="ic " aria-hidden="true"><use href="#i-check"/></svg></span><div><span class="t" style="color:#27303d;font-size:16.5px;line-height:1.35">Система устойчива к сбоям и растёт вместе с нагрузкой</span></div></div><div class="row"><span class="b" style="--s:40px;background:#2F8F5B"><svg class="ic " aria-hidden="true"><use href="#i-check"/></svg></span><div><span class="t" style="color:#27303d;font-size:16.5px;line-height:1.35">Это стандарт для современных распределённых приложений</span></div></div></div>
+				</div>
+			</div>
+		</div>
+		<div class="pf"><span>Токарев Александр Алексеевич, ИУ3-32М, taa21u591@bmstu.ru, Вариант 3</span><span class="pg"></span></div>
+	</section>
+
+	<section class="slide k dark" id="Thanks">
+		<div class="in">
+			<div class="end" style="display:flex;flex-direction:column;height:100%">
+				<span class="b" style="--s:84px;background:#C9A227"><svg class="ic " aria-hidden="true"><use href="#i-cube"/></svg></span>
+				<h2>Спасибо за внимание!</h2>
+				<p class="sub">Готов ответить на вопросы</p>
+				<p class="who">Токарев А.А. &nbsp;·&nbsp; ИУ3-32М &nbsp;·&nbsp; МГТУ им. Н.Э. Баумана</p>
+			</div>
+		</div>
+		<div class="pf"><span>Токарев Александр Алексеевич, ИУ3-32М, taa21u591@bmstu.ru, Вариант 3</span><span class="pg"></span></div>
+	</section>
+
+	<div class="progress"></div>
+
+	<script src="node_modules/@shower/core/dist/index.js"></script>
+</body>
+</html>
