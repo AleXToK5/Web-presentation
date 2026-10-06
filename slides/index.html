@@ -253,6 +253,114 @@
 			margin-right: 10px;
 		}
 
+		/* ---------- путь сервиса ---------- */
+		.k .devpath {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-top: 28px;
+			padding: 20px 18px;
+			background: #f2f3f5;
+			border-radius: 10px;
+		}
+		.k .dp-step {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 8px;
+			text-align: center;
+		}
+		.k .dp-step b { color: #1b3668; font-size: 15px; }
+		.k .dp-step span { color: #6b7686; font-size: 12px; }
+		.k .dp-arr { color: #c9a227; font-size: 22px; flex: none; }
+		.k .dp-helpers {
+			display: flex;
+			flex-direction: column;
+			gap: 14px;
+			margin-top: 22px;
+		}
+		.k .dp-h {
+			display: flex;
+			align-items: center;
+			gap: 14px;
+			padding: 12px 16px;
+			background: #f7f8fa;
+			border-radius: 8px;
+			border-left: 3px solid #c9a227;
+		}
+		.k .dp-h b { display: block; color: #1b3668; font-size: 14px; margin-bottom: 2px; }
+		.k .dp-h span { color: #4a5565; font-size: 13px; }
+
+		/* ---------- дашборд ---------- */
+		.k .dash-header {
+			display: flex;
+			gap: 12px;
+			margin: 14px 0 12px;
+		}
+		.k .dash-stat {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			padding: 10px 8px;
+			background: #fff;
+			border-radius: 8px;
+			box-shadow: 0 1px 4px rgba(27,54,104,.1);
+		}
+		.k .ds-num { font: bold 26px/1 Cambria, serif; color: #1b3668; }
+		.k .ds-lbl { margin-top: 4px; color: #6b7686; font-size: 11.5px; text-align: center; }
+		.k .dash-tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+		.k .dash-tbl th { padding: 6px 10px; background: #1b3668; color: #fff; font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; text-align: left; }
+		.k .dash-tbl td { padding: 7px 10px; border-bottom: 1px solid #e2e6ed; vertical-align: middle; }
+		.k .dash-tbl tr:nth-child(even) td { background: #f7f8fa; }
+		.k .st { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: bold; }
+		.k .st.ok { background: #eaf5ee; color: #2f8f5b; }
+		.k .st.warn { background: #fbeff1; color: #a6192e; }
+		.k .bar { height: 6px; width: var(--w); background: #3f7cac; border-radius: 3px; }
+
+		/* ---------- блоки кода ---------- */
+		.k .codebox {
+			display: flex;
+			flex-direction: column;
+			background: #1e2433;
+			border-radius: 10px;
+			overflow: hidden;
+		}
+		.k .cb-hdr {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			padding: 10px 16px;
+			background: #2a3347;
+			color: #c9d3e6;
+			font: bold 13px/1.3 'PT Sans', sans-serif;
+		}
+		.k .cb-hdr .b { flex: none; }
+		.k .cb-code {
+			flex: 1;
+			margin: 0;
+			padding: 14px 18px;
+			background: transparent;
+			color: #e4e9f3;
+			font: 12.5px/1.55 'PT Mono', 'Consolas', monospace;
+			white-space: pre;
+			overflow: hidden;
+		}
+		.k .cb-code .kw  { color: #c9a227; font-weight: bold; }
+		.k .cb-code .fn  { color: #7ec8e3; }
+		.k .cb-code .st  { color: #a8d8a8; }
+		.k .cb-code .cm  { color: #6b8fa8; }
+		.k .cb-code .tp  { color: #3f7cac; }
+		.k .cb-code .nm  { color: #f0a070; }
+		.k .cb-note {
+			padding: 10px 16px;
+			background: #2a3347;
+			color: #8899bb;
+			font-size: 12.5px;
+			line-height: 1.4;
+		}
+		.k .cb-note code { color: #c9a227; font-family: 'PT Mono', monospace; }
+
 		/* ---------- финал ---------- */
 		.k .end { align-items: center; justify-content: center; text-align: center; }
 		.k .end h2 { margin-top: 26px; font-size: 44px; }
@@ -317,7 +425,7 @@
 	</section>
 
 	<section class="slide k" id="Plan">
-		<div class="in"><div class="ey">ПЛАН ПРЕЗЕНТАЦИИ</div><h2>Содержание</h2><div class="toc"><div><span>01</span>Что такое распределённые системы</div><div><span>02</span>Kubernetes: что это и зачем</div><div><span>03</span>Архитектура и основные объекты</div><div><span>04</span>Масштабирование и отказоустойчивость</div><div><span>05</span>Пример из реальной жизни</div><div><span>06</span>Будущее технологии и выводы</div></div>
+		<div class="in"><div class="ey">ПЛАН ПРЕЗЕНТАЦИИ</div><h2>Содержание</h2><div class="toc"><div><span>01</span>Что такое распределённые системы</div><div><span>02</span>Kubernetes: что это и зачем</div><div><span>03</span>Архитектура и основные объекты</div><div><span>04</span>Масштабирование и отказоустойчивость</div><div><span>05</span>Пример и инженерные инструменты</div><div><span>06</span>Будущее технологии и выводы</div></div>
 		</div>
 		<div class="pf"><span>Токарев Александр Алексеевич, ИУ3-32М, taa21u591@bmstu.ru, Вариант 3</span><span class="pg"></span></div>
 	</section>
@@ -477,6 +585,175 @@
 				<div class="part"><span class="b" style="--s:56px;background:#3F7CAC"><svg class="ic " aria-hidden="true"><use href="#i-mobile"/></svg></span><h3>Frontend</h3><p>интерфейс магазина</p></div><div class="arr" style="font-size:20px"><svg class="ic " aria-hidden="true"><use href="#i-arrow"/></svg></div>
 				<div class="part"><span class="b" style="--s:56px;background:#1B3668"><svg class="ic " aria-hidden="true"><use href="#i-gear"/></svg></span><h3>API / Backend</h3><p>обработка заказов</p></div><div class="arr" style="font-size:20px"><svg class="ic " aria-hidden="true"><use href="#i-arrow"/></svg></div>
 				<div class="part"><span class="b" style="--s:56px;background:#C9A227"><svg class="ic " aria-hidden="true"><use href="#i-database"/></svg></span><h3>База данных</h3><p>хранит товары и заказы</p></div>
+			</div>
+		</div>
+		<div class="pf"><span>Токарев Александр Алексеевич, ИУ3-32М, taa21u591@bmstu.ru, Вариант 3</span><span class="pg"></span></div>
+	</section>
+
+	<section class="slide k" id="DevPath">
+		<div class="in">
+			<div class="ey">ИНЖЕНЕРНАЯ ЧАСТЬ</div>
+			<h2>Путь сервиса от кода до кластера</h2>
+			<div class="devpath">
+				<div class="dp-step">
+					<span class="b" style="--s:52px;background:#1B3668"><svg class="ic" aria-hidden="true"><use href="#i-list"/></svg></span>
+					<b>Код</b><span>Git · IDE</span>
+				</div>
+				<div class="dp-arr"><svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></div>
+				<div class="dp-step">
+					<span class="b" style="--s:52px;background:#3F7CAC"><svg class="ic" aria-hidden="true"><use href="#i-cube"/></svg></span>
+					<b>Образ</b><span>Docker</span>
+				</div>
+				<div class="dp-arr"><svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></div>
+				<div class="dp-step">
+					<span class="b" style="--s:52px;background:#C9A227"><svg class="ic" aria-hidden="true"><use href="#i-database"/></svg></span>
+					<b>Реестр</b><span>Registry</span>
+				</div>
+				<div class="dp-arr"><svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></div>
+				<div class="dp-step">
+					<span class="b" style="--s:52px;background:#2F8F5B"><svg class="ic" aria-hidden="true"><use href="#i-layers"/></svg></span>
+					<b>Манифест</b><span>Helm · kubectl</span>
+				</div>
+				<div class="dp-arr"><svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></div>
+				<div class="dp-step">
+					<span class="b" style="--s:52px;background:#A6192E"><svg class="ic" aria-hidden="true"><use href="#i-gear"/></svg></span>
+					<b>Кластер</b><span>Kubernetes</span>
+				</div>
+			</div>
+			<div class="dp-helpers">
+				<div class="dp-h">
+					<span class="b" style="--s:38px;background:#1B3668"><svg class="ic" aria-hidden="true"><use href="#i-server"/></svg></span>
+					<div><b>minikube · kind</b><span>Свой кластер Kubernetes на ноутбуке — для проверки кода</span></div>
+				</div>
+				<div class="dp-h">
+					<span class="b" style="--s:38px;background:#3F7CAC"><svg class="ic" aria-hidden="true"><use href="#i-exchange"/></svg></span>
+					<div><b>Skaffold · Tilt</b><span>Сами пересобирают и перезапускают сервис при правке кода</span></div>
+				</div>
+				<div class="dp-h">
+					<span class="b" style="--s:38px;background:#C9A227"><svg class="ic" aria-hidden="true"><use href="#i-chart"/></svg></span>
+					<div><b>GitLab CI · Argo CD</b><span>Выкладывают сервис в кластер автоматически после git push</span></div>
+				</div>
+			</div>
+		</div>
+		<div class="pf"><span>Токарев Александр Алексеевич, ИУ3-32М, taa21u591@bmstu.ru, Вариант 3</span><span class="pg"></span></div>
+	</section>
+
+	<section class="slide k" id="Dashboard">
+		<div class="in">
+			<div class="ey">ИНЖЕНЕРНАЯ ЧАСТЬ</div>
+			<h2>Админка кластера: как это выглядит</h2>
+			<div class="two-eq">
+				<div class="panel">
+					<h3>Панель администратора кластера</h3>
+					<div class="dash-header">
+						<div class="dash-stat"><span class="ds-num">12</span><span class="ds-lbl">Pods</span></div>
+						<div class="dash-stat"><span class="ds-num">3</span><span class="ds-lbl">Pods работают</span></div>
+						<div class="dash-stat"><span class="ds-num">42%</span><span class="ds-lbl">Нагрузка CPU</span></div>
+					</div>
+					<table class="dash-tbl">
+						<thead><tr><th>Pod</th><th>Статус</th><th>Нагрузка</th></tr></thead>
+						<tbody>
+							<tr><td>shop-frontend-1</td><td><span class="st ok">Running</span></td><td><div class="bar" style="--w:35%"></div></td></tr>
+							<tr><td>shop-api-1</td><td><span class="st ok">Running</span></td><td><div class="bar" style="--w:60%"></div></td></tr>
+							<tr><td>shop-api-2</td><td><span class="st warn">Restarting</span></td><td><div class="bar" style="--w:10%;background:#A6192E"></div></td></tr>
+							<tr><td>shop-db-0</td><td><span class="st ok">Running</span></td><td><div class="bar" style="--w:45%"></div></td></tr>
+						</tbody>
+					</table>
+					<p class="note" style="margin-top:8px">Схема-пример интерфейса администратора</p>
+				</div>
+				<div class="panel">
+					<h3>Инструменты администрирования</h3>
+					<div class="rows">
+						<div class="row"><span class="b" style="--s:44px;background:#1B3668"><svg class="ic" aria-hidden="true"><use href="#i-globe"/></svg></span><span><b>Kubernetes Dashboard</b> — веб-интерфейс: поды, логи, нагрузка на кластер</span></div>
+						<div class="row"><span class="b" style="--s:44px;background:#3F7CAC"><svg class="ic" aria-hidden="true"><use href="#i-server"/></svg></span><span><b>Lens · k9s</b> — управление кластером с компьютера или из терминала</span></div>
+						<div class="row"><span class="b" style="--s:44px;background:#C9A227"><svg class="ic" aria-hidden="true"><use href="#i-chart"/></svg></span><span><b>Prometheus + Grafana</b> — графики нагрузки и оповещения о сбоях</span></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="pf"><span>Токарев Александр Алексеевич, ИУ3-32М, taa21u591@bmstu.ru, Вариант 3</span><span class="pg"></span></div>
+	</section>
+
+	<section class="slide k" id="Code">
+		<div class="in">
+			<div class="ey">ИНЖЕНЕРНАЯ ЧАСТЬ</div>
+			<h2>Код микросервиса: пример</h2>
+			<div class="two-eq">
+				<div class="codebox">
+					<div class="cb-hdr"><span class="b" style="--s:28px;background:#3F7CAC"><svg class="ic" aria-hidden="true"><use href="#i-list"/></svg></span> main.py — сервис заказов</div>
+<pre class="cb-code"><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+
+app = FastAPI()
+
+<span class="cm">@app.get</span>(<span class="st">"/health"</span>)
+<span class="kw">def</span> <span class="fn">health</span>():
+    <span class="kw">return</span> {<span class="st">"status"</span>: <span class="st">"ok"</span>}
+
+<span class="cm">@app.get</span>(<span class="st">"/orders/{order_id}"</span>)
+<span class="kw">def</span> <span class="fn">get_order</span>(order_id: <span class="tp">int</span>):
+    <span class="kw">return</span> {<span class="st">"id"</span>: order_id, <span class="st">"state"</span>: <span class="st">"paid"</span>}</pre>
+					<p class="cb-note">Адрес <code>/health</code> — «пульс» сервиса: по нему Kubernetes проверяет, что контейнер жив, и перезапускает его при сбое.</p>
+				</div>
+				<div class="codebox">
+					<div class="cb-hdr"><span class="b" style="--s:28px;background:#1B3668"><svg class="ic" aria-hidden="true"><use href="#i-cube"/></svg></span> Dockerfile — упаковка в контейнер</div>
+<pre class="cb-code"><span class="kw">FROM</span> python:3.12-slim
+<span class="kw">WORKDIR</span> /app
+<span class="kw">COPY</span> requirements.txt .
+<span class="kw">RUN</span> pip install -r requirements.txt
+<span class="kw">COPY</span> . .
+<span class="kw">CMD</span> [<span class="st">"uvicorn"</span>, <span class="st">"main:app"</span>, <span class="st">"--host"</span>, <span class="st">"0.0.0.0"</span>]
+
+<span class="cm"># собрать и отправить образ в реестр</span>
+docker build -t shop/orders:1.0 .
+docker push shop/orders:1.0</pre>
+				</div>
+			</div>
+		</div>
+		<div class="pf"><span>Токарев Александр Алексеевич, ИУ3-32М, taa21u591@bmstu.ru, Вариант 3</span><span class="pg"></span></div>
+	</section>
+
+	<section class="slide k" id="Manifest">
+		<div class="in">
+			<div class="ey">ИНЖЕНЕРНАЯ ЧАСТЬ</div>
+			<h2>Манифест и команды управления</h2>
+			<div class="two-eq">
+				<div class="codebox">
+					<div class="cb-hdr"><span class="b" style="--s:28px;background:#2F8F5B"><svg class="ic" aria-hidden="true"><use href="#i-layers"/></svg></span> deployment.yaml — желаемое состояние</div>
+<pre class="cb-code"><span class="kw">apiVersion</span>: apps/v1
+<span class="kw">kind</span>: Deployment
+<span class="kw">metadata</span>:
+  name: orders
+<span class="kw">spec</span>:
+  replicas: <span class="nm">3</span>
+  selector:
+    matchLabels: {app: orders}
+  template:
+    metadata:
+      labels: {app: orders}
+    spec:
+      containers:
+      - name: orders
+        image: shop/orders:1.0
+        livenessProbe:
+          httpGet: {path: /health, port: <span class="nm">8000</span>}</pre>
+				</div>
+				<div class="codebox">
+					<div class="cb-hdr"><span class="b" style="--s:28px;background:#A6192E"><svg class="ic" aria-hidden="true"><use href="#i-exchange"/></svg></span> kubectl — команды администратора</div>
+<pre class="cb-code"><span class="cm"># применить манифест</span>
+kubectl apply -f deployment.yaml
+
+<span class="cm"># посмотреть поды</span>
+kubectl get pods
+
+<span class="cm"># запустить 5 копий</span>
+kubectl scale deploy/orders --replicas=<span class="nm">5</span>
+
+<span class="cm"># посмотреть логи</span>
+kubectl logs deploy/orders
+
+<span class="cm"># откатить версию</span>
+kubectl rollout undo deploy/orders</pre>
+				</div>
 			</div>
 		</div>
 		<div class="pf"><span>Токарев Александр Алексеевич, ИУ3-32М, taa21u591@bmstu.ru, Вариант 3</span><span class="pg"></span></div>
